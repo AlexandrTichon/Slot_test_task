@@ -24,7 +24,10 @@ app.renderer.backgroundColor = 0x00b721;
 // Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
 
-let state;
+let state: () => void;
+const homeScene = new Container();
+const gameWheelsArray: object[] = [];
+let wheelSpeed: number[] = [];
 
 loader
   .add(["../assets/img/slotOverlay.png",
@@ -46,10 +49,12 @@ loader
   .load(setup);
 
 function setup() {
-  const homeScene = new Container();
+
+  // home Scene
 
   const slotOverlay = new Sprite(resources["../assets/img/slotOverlay.png"].texture);
   homeScene.addChild(slotOverlay);
+
   for (let j = 0; j < 5; j++) {
     const slotColumn = new Container();
     for (let i = 1; i <= 4; i++) {
@@ -60,23 +65,77 @@ function setup() {
     slotColumn.position.set(196 * j, -101);
     homeScene.addChild(slotColumn);
   }
+  const rectangle = new Rectangle(192, 128, 64, 64);
   app.stage.addChild(homeScene);
-  state = play;
 
-  // Create a `gameOverScene` group
-  // Assign the player's keyboard controllers
+  // gaming wheel (5 instance)
+  for (let i = 0; i < 5; i++) {
+    const gameWheel = new Container();
+    let imageCounter = 1;
+    for (let j = 0; j < 39; j++) {
+      if (imageCounter % 13 === 0) {
+        imageCounter = 1;
+      }
+      const imageNumber = imageCounter > 9 ? imageCounter : `0${imageCounter}`;
+      const weelElement = new Sprite(resources[`../assets/img/symbols/${imageNumber}.png`].texture);
+      weelElement.position.set(80, 196 * j + 15);
+      gameWheel.addChild(weelElement);
+      imageCounter++;
+    }
+    Object.defineProperty(gameWheel, "vy", {
+      value: 0,
+      configurable: true,
+      writable: true,
+      enumerable: true,
+    });
+    gameWheel.position.set(178 * i, -4094);
+    gameWheelsArray.push(gameWheel);
+    homeScene.addChild(gameWheel);
+  }
 
-  // set the game state to `play`
-
-  // Start the game loop
-  // app.ticker.add(() => gameLoop());
+  document.addEventListener("keydown", (e) => {
+    if (e.keyCode === 32 && state !== spin) {
+      wheelSpeed = [5, -5, 5, -5, 5, -5];
+      if (state) {
+        state = spin;
+      } else {
+        state = spin;
+        app.ticker.add(() => gameLoop());
+      }
+    } else if (e.keyCode === 32 && state === spin) {
+      state = stop;
+    }
+  });
 }
 
-// function gameLoop() {
-//   btnSpin.x += btnSpin.vx;
-//   btnSpin.y += btnSpin.vy;
-// }
+function gameLoop() {
+  state();
+}
 
-function play() {
-  // All the game logic goes here
+function spin() {
+  // Configure speed of wheels
+  gameWheelsArray.forEach((wheel: PIXI.Sprite, index) => {
+    wheel.y += wheelSpeed[index];
+    if (Math.abs(Math.abs(wheel.y) - wheel.height) - 556 < 556
+      || Math.abs(wheel.y) - 556 < 556) {
+      wheelSpeed.reverse();
+      const params = {
+        wheel,
+        speed: wheelSpeed[index],
+      };
+      // const event = new KeyboardEvent("keydown", {
+      //   code: "32",
+      // });
+      // window.dispatchEvent(event);
+      // state = stop;
+    }
+  });
+}
+
+function stop() {
+  gameWheelsArray.forEach((wheel: PIXI.Sprite, index) => {
+    if ( (Math.abs(wheel.y) + 420) % 196 === 0) {
+      return true;
+    } else { wheel.y += wheelSpeed[index]; }
+  });
 }

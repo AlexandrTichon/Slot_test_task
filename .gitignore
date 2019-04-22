@@ -86,10 +86,12 @@ typings/
 
 ### VisualStudioCode ###
 .vscode/*
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.vscode-janus-debug
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
