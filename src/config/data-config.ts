@@ -1,3 +1,4 @@
+import {Howl, Howler} from "howler";
 import * as PIXI from "pixi.js";
 
 // Aliases
@@ -42,4 +43,13 @@ export const SPRITE_SIZES = {
     width: 196,
     height: 178,
   },
+};
+
+export const APP_SOUNDS = {
+  reelSpin: new Howl({
+    src: ["../assets/audio/Reel_Spin.mp3"],
+  }),
+  landing: new Howl({
+    src: ["../assets/audio/Landing_1.mp3"],
+  }),
 };

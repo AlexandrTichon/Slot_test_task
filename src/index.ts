@@ -4,9 +4,10 @@ import { drawGraphics } from "./api/graphics";
 import { createWheel, wheelCanStop, wheelSpeedShouldReverse } from "./api/wheel";
 import { APP_BACKGROUND, APP_SCREEN_SIZES, SPIN_BTN } from "./config/app-config";
 import {
-  Application,  Container,  images,
-  initialWheelSpeed,  loader,  resources,
-  Sprite,  SPRITE_SIZES,
+  APP_SOUNDS,  Application,  Container,
+  images,  initialWheelSpeed,  loader,
+  resources,  Sprite,
+  SPRITE_SIZES,
 } from "./config/data-config";
 import "./index.scss";
 
@@ -69,6 +70,7 @@ function setup() {
   SPIN_BTN.addEventListener("click", () => {
     if (state !== spin) {
       wheelSpeed = [...initialWheelSpeed];
+      APP_SOUNDS.reelSpin.play();  // play sounds
       SPIN_BTN.setAttribute("disabled", "");
       if (state) {
         state = spin;
@@ -79,8 +81,10 @@ function setup() {
     }
     setTimeout(() => {
       state = stop;
+      APP_SOUNDS.reelSpin.stop();
+      APP_SOUNDS.landing.play();
       SPIN_BTN.removeAttribute("disabled");
-    }, 3000);
+    }, 5700);
   });
 }
 
