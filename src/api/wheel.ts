@@ -1,11 +1,9 @@
-import * as PIXI from "pixi.js";
-
 import {
   Container,
   resources,
   Sprite,
   SPRITE_SIZES,
-} from "./config/data-config";
+} from "../config/data-config";
 
 export function createWheel(spriteNum: number, spriteSrcFolder: string) {
   // wheel consist from 3 same elements (wheelElement), that consist sprites

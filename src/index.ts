@@ -1,31 +1,27 @@
 import * as PIXI from "pixi.js";
 
-import { APP_BACKGROUND } from "./config/app-config";
+import { drawGraphics } from "./api/graphics";
+import { createWheel, wheelCanStop, wheelSpeedShouldReverse } from "./api/wheel";
+import { APP_BACKGROUND, APP_SCREEN_SIZES, SPIN_BTN } from "./config/app-config";
 import {
-  Application,
-  Container,
-  images,
-  initialWheelSpeed,
-  loader,
-  resources,
-  Sprite,
-  SPRITE_SIZES,
+  Application,  Container,  images,
+  initialWheelSpeed,  loader,  resources,
+  Sprite,  SPRITE_SIZES,
 } from "./config/data-config";
-import { drawGraphics } from "./graphics";
-import { createWheel, wheelCanStop, wheelSpeedShouldReverse } from "./wheelAPI";
+import "./index.scss";
 
 // Create a Pixi Application
 const app = new Application({
   antialias: true,
   transparent: false,
   resolution: 1,
-  height: 650,
-  width: 1150,
+  height: APP_SCREEN_SIZES.height,
+  width: APP_SCREEN_SIZES.width,
 });
 
 app.renderer.backgroundColor = APP_BACKGROUND;
 
-document.body.appendChild(app.view);
+document.querySelector("#game-content").appendChild(app.view);
 
 let state: () => void;
 const homeScene = new Container();
@@ -69,18 +65,22 @@ function setup() {
   homeScene.addChild(slotOverlay);
   app.stage.addChild(homeScene);
 
-  document.addEventListener("keydown", (e) => {
-    if (e.keyCode === 32 && state !== spin) {
+  // add spin-btn handler
+  SPIN_BTN.addEventListener("click", () => {
+    if (state !== spin) {
       wheelSpeed = [...initialWheelSpeed];
+      SPIN_BTN.setAttribute("disabled", "");
       if (state) {
         state = spin;
       } else {
         state = spin;
         app.ticker.add(() => gameLoop());
       }
-    } else if (e.keyCode === 32 && state === spin) {
-      state = stop;
     }
+    setTimeout(() => {
+      state = stop;
+      SPIN_BTN.removeAttribute("disabled");
+    }, 3000);
   });
 }
 
