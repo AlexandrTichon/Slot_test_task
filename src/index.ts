@@ -28,6 +28,7 @@ let state: () => void;
 const homeScene = new Container();
 const wheelContainer: object[] = [];
 let wheelSpeed: number[] = [];
+let previousWheelSpeed: number[] = [];
 
 loader
   .add(images)
@@ -69,13 +70,16 @@ function setup() {
   // add spin-btn handler
   SPIN_BTN.addEventListener("click", () => {
     if (state !== spin) {
-      wheelSpeed = [...initialWheelSpeed];
       APP_SOUNDS.reelSpin.play();  // play sounds
       SPIN_BTN.setAttribute("disabled", "");
       if (state) {
         state = spin;
+        console.log(previousWheelSpeed);
+        wheelSpeed = [...previousWheelSpeed];
       } else {
         state = spin;
+        wheelSpeed = [...initialWheelSpeed];
+        previousWheelSpeed = [...initialWheelSpeed];
         app.ticker.add(() => gameLoop());
       }
     }
@@ -97,6 +101,8 @@ function spin() {
   wheelContainer.forEach((wheel: PIXI.Sprite, index) => {
     if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
       wheelSpeed[index] = - wheelSpeed[index];
+      previousWheelSpeed[index] = wheelSpeed[index];
+      console.log(previousWheelSpeed[index]);
     }
     wheel.y += wheelSpeed[index];
   });
@@ -112,6 +118,7 @@ function stop() {
     } else {
       if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
         wheelSpeed[index] = - wheelSpeed[index];
+        previousWheelSpeed[index] = - wheelSpeed[index];
       }
       wheel.y += wheelSpeed[index];
     }
