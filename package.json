@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack -d && cp src/index.html dist/index.html && webpack-dev-server --open --inline --hot",
     "build:prod": "webpack -p && cp src/index.html dist/index.html",
-    "start": "build",
+    "start": "npm run build",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "fix-lint": "./node_modules/.bin/tslint src/ --fix"
   },
@@ -53,6 +53,7 @@
     "tslint": "^5.15.0",
     "typescript": "^3.4.3",
     "url-loader": "^1.1.2",
+    "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.3.1"
   }
 }
