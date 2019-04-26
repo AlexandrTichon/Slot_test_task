@@ -74,7 +74,6 @@ function setup() {
       SPIN_BTN.setAttribute("disabled", "");
       if (state) {
         state = spin;
-        console.log(previousWheelSpeed);
         wheelSpeed = [...previousWheelSpeed];
       } else {
         state = spin;
@@ -102,7 +101,6 @@ function spin() {
     if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
       wheelSpeed[index] = - wheelSpeed[index];
       previousWheelSpeed[index] = wheelSpeed[index];
-      console.log(previousWheelSpeed[index]);
     }
     wheel.y += wheelSpeed[index];
   });
