@@ -1,82 +1,124 @@
 import * as PIXI from "pixi.js";
-/// <reference path="../node_modules/pixi-module/stuff.d.ts">
 
-// Aliases
-const Application = PIXI.Application;
-const Container = PIXI.Container;
-const loader = PIXI.loader;
-const resources = PIXI.loader.resources;
-const TextureCache = PIXI.utils.TextureCache;
-const Sprite = PIXI.Sprite;
-const Rectangle = PIXI.Rectangle;
+import { drawGraphics } from "./api/graphics";
+import { createWheel, wheelCanStop, wheelSpeedShouldReverse } from "./api/wheel";
+import { APP_BACKGROUND, APP_SCREEN_SIZES, SPIN_BTN } from "./config/app-config";
+import {
+  APP_SOUNDS,  Application,  Container,
+  images,  initialWheelSpeed,  loader,
+  resources,  Sprite,
+  SPRITE_SIZES,
+} from "./config/data-config";
+import "./index.scss";
 
 // Create a Pixi Application
 const app = new Application({
   antialias: true,
   transparent: false,
   resolution: 1,
-  height: 650,
-  width: 1150,
+  height: APP_SCREEN_SIZES.height,
+  width: APP_SCREEN_SIZES.width,
 });
 
-app.renderer.backgroundColor = 0x00b721;
+app.renderer.backgroundColor = APP_BACKGROUND;
 
-// Add the canvas that Pixi automatically created for you to the HTML document
-document.body.appendChild(app.view);
+document.querySelector("#game-content").appendChild(app.view);
 
-let state;
+let state: () => void;
+const homeScene = new Container();
+const wheelContainer: object[] = [];
+let wheelSpeed: number[] = [];
+let previousWheelSpeed: number[] = [];
 
 loader
-  .add(["../assets/img/slotOverlay.png",
-    "../assets/img/winningFrameBackground.jpg",
-    "../assets/img/symbols/01.png",
-    "../assets/img/symbols/02.png",
-    "../assets/img/symbols/03.png",
-    "../assets/img/symbols/04.png",
-    "../assets/img/symbols/05.png",
-    "../assets/img/symbols/06.png",
-    "../assets/img/symbols/07.png",
-    "../assets/img/symbols/08.png",
-    "../assets/img/symbols/09.png",
-    "../assets/img/symbols/10.png",
-    "../assets/img/symbols/11.png",
-    "../assets/img/symbols/12.png",
-    "../assets/img/symbols/13.png",
-  ])
+  .add(images)
   .load(setup);
 
 function setup() {
-  const homeScene = new Container();
+  const {wheelInterval, backgroundElementSizes, symbolSizes} = SPRITE_SIZES;
 
+  // draw background
   const slotOverlay = new Sprite(resources["../assets/img/slotOverlay.png"].texture);
-  homeScene.addChild(slotOverlay);
-  for (let j = 0; j < 5; j++) {
+  for (let j = 0; j < 6; j++) {
     const slotColumn = new Container();
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const slotBackground = new Sprite(resources["../assets/img/winningFrameBackground.jpg"].texture);
-      slotBackground.position.set(60, 139 * i);
+      slotBackground.position.set(0, backgroundElementSizes.height * i);
       slotColumn.addChild(slotBackground);
     }
-    slotColumn.position.set(196 * j, -101);
+    slotColumn.position.set(symbolSizes.width * j, 0);
     homeScene.addChild(slotColumn);
   }
+
+  // gaming wheels (5 instance)
+  for (let i = 0; i < 5; i++) {
+    const wheel = createWheel(13, "../assets/img/symbols/");
+    wheel.position.set(((178 + wheelInterval) * i - wheelInterval),
+     -wheel.height / 2 - wheelInterval * 3);
+    wheelContainer.push(wheel);
+    homeScene.addChild(wheel);
+  }
+
+  // draw frame
+  const graphics = new PIXI.Graphics();
+  drawGraphics(graphics);
+  homeScene.addChild(graphics);
+
+  homeScene.addChild(slotOverlay);
   app.stage.addChild(homeScene);
-  state = play;
 
-  // Create a `gameOverScene` group
-  // Assign the player's keyboard controllers
-
-  // set the game state to `play`
-
-  // Start the game loop
-  // app.ticker.add(() => gameLoop());
+  // add spin-btn handler
+  SPIN_BTN.addEventListener("click", () => {
+    if (state !== spin) {
+      APP_SOUNDS.reelSpin.play();  // play sounds
+      SPIN_BTN.setAttribute("disabled", "");
+      if (state) {
+        state = spin;
+        wheelSpeed = [...previousWheelSpeed];
+      } else {
+        state = spin;
+        wheelSpeed = [...initialWheelSpeed];
+        previousWheelSpeed = [...initialWheelSpeed];
+        app.ticker.add(() => gameLoop());
+      }
+    }
+    setTimeout(() => {
+      state = stop;
+      APP_SOUNDS.reelSpin.stop();
+      APP_SOUNDS.landing.play();
+      SPIN_BTN.removeAttribute("disabled");
+    }, 5700);
+  });
 }
 
-// function gameLoop() {
-//   btnSpin.x += btnSpin.vx;
-//   btnSpin.y += btnSpin.vy;
-// }
+function gameLoop() {
+  state();
+}
 
-function play() {
-  // All the game logic goes here
+function spin() {
+  // Configure speed of wheels
+  wheelContainer.forEach((wheel: PIXI.Sprite, index) => {
+    if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
+      wheelSpeed[index] = - wheelSpeed[index];
+      previousWheelSpeed[index] = wheelSpeed[index];
+    }
+    wheel.y += wheelSpeed[index];
+  });
+}
+
+function stop() {
+  wheelContainer.forEach((wheel: PIXI.Sprite, index) => {
+    const stopData = wheelCanStop(wheel.y, wheelSpeed[index]);
+    if (stopData.flag) {
+      wheel.y += stopData.stopDistance;
+      wheelSpeed[index] = 0;
+      return true;
+    } else {
+      if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
+        wheelSpeed[index] = - wheelSpeed[index];
+        previousWheelSpeed[index] = - wheelSpeed[index];
+      }
+      wheel.y += wheelSpeed[index];
+    }
+  });
 }
