@@ -53,8 +53,7 @@ function setup() {
   // gaming wheels (5 instance)
   for (let i = 0; i < 5; i++) {
     const wheel = createWheel(13, "../assets/img/symbols/");
-    wheel.position.set(((178 + wheelInterval) * i - wheelInterval),
-     -wheel.height / 2 - wheelInterval * 3);
+    wheel.position.set(((178 + wheelInterval) * i - wheelInterval), wheelInterval);
     wheelContainer.push(wheel);
     homeScene.addChild(wheel);
   }
@@ -97,10 +96,12 @@ function gameLoop() {
 
 function spin() {
   // Configure speed of wheels
+  const { backgroundSizes, stdWheelHeight, symbolSizes } = SPRITE_SIZES;
   wheelContainer.forEach((wheel: PIXI.Sprite, index) => {
-    if (wheelSpeedShouldReverse(wheel.y, wheel.height)) {
-      wheelSpeed[index] = - wheelSpeed[index];
-      previousWheelSpeed[index] = wheelSpeed[index];
+    if (wheel.y + wheel.height <= backgroundSizes.height + symbolSizes.height) {
+      const additionalWheel = createWheel(13, "../assets/img/symbols/");
+      additionalWheel.position.set(0, wheel.height);
+      wheel.addChild(additionalWheel);
     }
     wheel.y += wheelSpeed[index];
   });

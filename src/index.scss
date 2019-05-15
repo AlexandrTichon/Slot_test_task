@@ -3,6 +3,8 @@ html, body {
 	padding: 0;
 	border: 0;
 	font-size: 100%;
+	width: 100%;
+	height: 100vh;
 	vertical-align: baseline;
 }
 
@@ -14,6 +16,8 @@ html, body {
 .game-container {
 	background-color: #00b721;
 	display: flex;
+	width: 100%;
+	height: 100%;
 	flex-direction: row;
 	justify-content: flex-start;
 	align-items: center; 
