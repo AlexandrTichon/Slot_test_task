@@ -1,4 +1,4 @@
-import {Howl, Howler} from "howler";
+import {Howl} from "howler";
 import * as PIXI from "pixi.js";
 
 // Aliases
@@ -10,7 +10,7 @@ export const TextureCache = PIXI.utils.TextureCache;
 export const Sprite = PIXI.Sprite;
 export const Rectangle = PIXI.Rectangle;
 
-export const initialWheelSpeed = [5, -2, 8, -3, -5, 10];
+export const initialWheelSpeed = [-5, -2, -8, -3, -7];
 
 export const images = ["../assets/img/slotOverlay.png",
 "../assets/img/winningFrameBackground.jpg",
@@ -43,6 +43,7 @@ export const SPRITE_SIZES = {
     width: 196,
     height: 178,
   },
+  stdWheelHeight: 2314,
 };
 
 export const APP_SOUNDS = {
