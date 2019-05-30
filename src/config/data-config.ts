@@ -10,7 +10,7 @@ export const TextureCache = PIXI.utils.TextureCache;
 export const Sprite = PIXI.Sprite;
 export const Rectangle = PIXI.Rectangle;
 
-export const initialWheelSpeed = [10, 12, 11, 19, 15];
+export const initialWheelSpeed = [25, 28, 24, 29, 27];
 
 export const images = ["../assets/img/slotOverlay.png",
 "../assets/img/winningFrameBackground.jpg",

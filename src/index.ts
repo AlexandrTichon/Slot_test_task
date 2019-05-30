@@ -113,7 +113,7 @@ function setup() {
       APP_SOUNDS.reelSpin.stop();
       APP_SOUNDS.landing.play();
       SPIN_BTN.removeAttribute("disabled");
-    }, 5700);
+    }, 3000);
   });
 }
 
@@ -149,7 +149,7 @@ function stop() {
     if (index > 0) {
       const currentTime = new Date();
       const delay = currentTime.getTime() - delayEndArr[index - 1];
-      delayFlag = delay > 200;
+      delayFlag = delay > 150;
     }
     if (stopData.flag && index === stoppedWheels && delayFlag) {
       wheel.y += stopData.stopDistance;
