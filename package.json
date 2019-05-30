@@ -35,7 +35,7 @@
     "@types/pixi.js": "^4.8.7",
     "gh-pages": "^2.0.1",
     "howler": "^2.1.2",
-    "pixi-tween": "^0.2.0",
+    "pixi-animate": "^1.3.4",
     "pixi.js": "^4.8.7",
     "webpack": "^4.30.0"
   },
